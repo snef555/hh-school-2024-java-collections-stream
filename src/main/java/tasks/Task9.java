@@ -1,10 +1,10 @@
 package tasks;
 
 import common.Person;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,7 @@ P.P.S Здесь ваши правки необходимо прокоммент
  */
 public class Task9 {
 
-  private long count;
+  //private long count;
 
   // Костыль, эластик всегда выдает в топе "фальшивую персону".
   // Конвертируем начиная со второй
@@ -31,9 +31,6 @@ public class Task9 {
     в целом реализация внутри не ясна, но кажется обращение к size() не должно в реальности вызывать проход по списку
     для подсчета кол-ва элементов, т.к. логично хранить размер во внутренней переменной
     */
-    if (persons.isEmpty()) {
-      return Collections.emptyList();
-    }
     /*
     по remove есть не понятный момент - с т.з. логики операция remove(0) должна выполняться за O(1) т.к. это указатель
     на вершину списка (т.е. при удалении из вершины мы просто указатель начала списка передвигаем на следующий элемент),
@@ -57,74 +54,26 @@ public class Task9 {
 
   // Тут фронтовая логика, делаем за них работу - склеиваем ФИО
   public String convertPersonToString(Person person) {
-    String result = "";
-    if (person.secondName() != null) {
-      result += person.secondName();
-    }
-
-    //если строка будет пустой, то лишний пробел в ФИО
-    if (person.firstName() != null) {
-      result += " " + person.firstName();
-    }
-
-    //отчество -> middleName + если строка будет пустой, то лишний пробел в ФИО (для имени добавлять не стал, т.к. имя есть всегда)
-    if (person.middleName() != null && ! person.middleName().isEmpty()) {
-      result += " " + person.middleName();
-    }
-    return result;
+    return Stream.of(person.secondName(), person.firstName(), person.middleName())
+        .filter(strName -> strName != null && !strName.isEmpty()).collect(Collectors.joining(" "));
   }
 
   // словарь id персоны -> ее имя
   public Map<Integer, String> getPersonNames(Collection<Person> persons) {
-    Map<Integer, String> map = new HashMap<>(1);
-    /*
-    Если передана пустая коллекция возвращаем HashMap c capacity 1
-    Если передана не пустая коллекция, то map можно получить через stream
-    */
-    if (! persons.isEmpty()) {
-      map = persons.stream().collect(Collectors.toMap(Person::id, this::convertPersonToString, (a, b) -> a));
-    }
-    /*
-    for (Person person : persons) {
-      if (!map.containsKey(person.id())) {
-        map.put(person.id(), convertPersonToString(person));
-      }
-    }*/
-
-    return map;
+    return persons.stream().collect(Collectors.toMap(Person::id, this::convertPersonToString, (a, b) -> a));
   }
 
   // есть ли совпадающие в двух коллекциях персоны?
   public boolean hasSamePersons(Collection<Person> persons1, Collection<Person> persons2) {
-    boolean has; /* = false; */
     /*
     надо проверить есть ли пересечение у этих множеств, если есть то совпадение есть
      */
-    persons1.retainAll(persons2);
-    has = ! persons1.isEmpty();
-    /*
-    for (Person person1 : persons1) {
-      for (Person person2 : persons2) {
-        if (person1.equals(person2)) {
-          has = true;
-        }
-      }
-    }
-    */
-    return has;
+    return new HashSet<>(persons1).retainAll(new HashSet<>(persons2));
   }
 
   // Посчитать число четных чисел
   public long countEven(Stream<Integer> numbers) {
-    count = 0;
-    /*
-    оптимизация, за один проход можно посчитать кол-во четных чисел
-    я хотел сделать переменную count локальной, но дальше началась какая-то жесть от IDE
-    long предлагает заменить на AtomicLong, дальше завернуть в объект или массив, в общем отказался от этой идеи :)
-    */
-    numbers.forEach(num -> {if (num % 2 == 0) count++;});
-    //numbers.filter(num -> num % 2 == 0).forEach(num -> count++);
-    return count;
+    return numbers.filter(num -> num % 2 == 0).count();
   }
 
   // Загадка - объясните почему assert тут всегда верен
