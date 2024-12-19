@@ -68,7 +68,11 @@ public class Task9 {
     /*
     надо проверить есть ли пересечение у этих множеств, если есть то совпадение есть
      */
-    return new HashSet<>(persons1).retainAll(new HashSet<>(persons2));
+    Set<Person> samePersons = new HashSet<>(persons1);
+
+    samePersons.retainAll(new HashSet<>(persons2));
+
+    return !samePersons.isEmpty();
   }
 
   // Посчитать число четных чисел
