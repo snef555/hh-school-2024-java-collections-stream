@@ -65,14 +65,7 @@ public class Task9 {
 
   // есть ли совпадающие в двух коллекциях персоны?
   public boolean hasSamePersons(Collection<Person> persons1, Collection<Person> persons2) {
-    /*
-    надо проверить есть ли пересечение у этих множеств, если есть то совпадение есть
-     */
-    Set<Person> samePersons = new HashSet<>(persons1);
-
-    samePersons.retainAll(new HashSet<>(persons2));
-
-    return !samePersons.isEmpty();
+    return new HashSet<>(persons1).stream().anyMatch(new HashSet<>(persons2)::contains);
   }
 
   // Посчитать число четных чисел
