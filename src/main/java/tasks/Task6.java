@@ -18,18 +18,18 @@ import java.util.stream.Collectors;
  */
 public class Task6 {
 
+  public static String determinePersonAreaName(Person person, Area area) {
+    return String.join(" - ", person.firstName(), area.getName());
+  }
+
   public static Set<String> getPersonDescriptions(Collection<Person> persons,
                                                   Map<Integer, Set<Integer>> personAreaIds,
                                                   Collection<Area> areas) {
     Map<Integer, Area> mapAreas = areas.stream().collect(Collectors.toMap(Area::getId, Function.identity()));
 
-    return persons.stream()
+    return (Set<String>) persons.stream()
         .flatMap(person -> personAreaIds.get(person.id()).stream()
-            .map(mapAreas::get)
-            .map(area -> {
-              String result = String.join(" - ", person.firstName(), area.getName());
-              return result;
-            }))
+            .map(areaId -> determinePersonAreaName(person, mapAreas.get(areaId))))
         .collect(Collectors.toSet());
   }
 }
